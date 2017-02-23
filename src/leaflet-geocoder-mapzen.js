@@ -53,7 +53,8 @@
       markers: true,
       expanded: false,
       autocomplete: true,
-      place: false
+      place: false,
+      filterString: false
     },
 
     initialize: function (apiKey, options) {
@@ -425,8 +426,20 @@
 
       var list = L.DomUtil.create('ul', 'leaflet-pelias-list', resultsContainer);
 
-      for (var i = 0, j = features.length; i < j; i++) {
-        var feature = features[i];
+      var filteredFeatures;
+      if (this.options.filterString) {
+        filteredFeatures = features.filter(function (f) {
+          if (f.properties && f.properties.label) {
+            return f.properties.label.indexOf(this.options.filterString) > -1;
+          }
+          return false;
+        });
+      } else {
+        filteredFeatures = features;
+      }
+
+      for (var i = 0, j = filteredFeatures.length; i < j; i++) {
+        var feature = filteredFeatures[i];
         var resultItem = L.DomUtil.create('li', 'leaflet-pelias-result', list);
 
         resultItem.feature = feature;
